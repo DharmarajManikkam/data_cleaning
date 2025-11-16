@@ -1,22 +1,37 @@
-- name: Install new Databricks CLI
-  run: |
-    curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+name: Databricks Feature CI
 
-- name: Configure Databricks CLI auth
-  run: |
-    export DATABRICKS_CONFIG_FILE="$HOME/.databrickscfg"
-    mkdir -p ~/.databrickscfg
-    cat <<EOF > ~/.databrickscfg
-    [DEFAULT]
-    host = $DATABRICKS_HOST
-    token = $DATABRICKS_TOKEN
-    EOF
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
 
-- name: Test authentication
-  run: databricks auth env-var
+jobs:
+  run-databricks-job:
+    runs-on: ubuntu-latest
 
-- name: Get current user
-  run: databricks current-user get
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-- name: Trigger Databricks Job
-  run: databricks jobs run-now --job-id "$DATABRICKS_JOB_ID"
+      - name: Install new Databricks CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+
+      - name: Configure Databricks CLI
+        run: |
+          mkdir -p ~/.databrickscfg
+          cat <<EOF > ~/.databrickscfg
+          [DEFAULT]
+          host = $DATABRICKS_HOST
+          token = $DATABRICKS_TOKEN
+          EOF
+
+      - name: Test Authentication
+        run: databricks auth env-var
+
+      - name: Get Current User
+        run: databricks current-user get
+
+      - name: Trigger Databricks Job
+        run: databricks jobs run-now --job-id "$DATABRICKS_JOB_ID"
+
