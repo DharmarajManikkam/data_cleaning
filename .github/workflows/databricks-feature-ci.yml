@@ -23,16 +23,14 @@ jobs:
           [DEFAULT]
           host = $DATABRICKS_HOST
           token = $DATABRICKS_TOKEN
+          auth_type = pat
           EOF
 
       - name: Test Authentication
         run: databricks auth env-var
 
-      # - name: Get Current User
-      #   run: databricks current-user get
       - name: Get Current User
         run: databricks current-user me
-
 
       - name: Trigger Databricks Job
         run: databricks jobs run-now --job-id "$DATABRICKS_JOB_ID"
