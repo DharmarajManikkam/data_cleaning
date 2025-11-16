@@ -19,7 +19,6 @@ jobs:
 
       - name: Configure Databricks CLI
         run: |
-          mkdir -p ~/.databrickscfg
           cat <<EOF > ~/.databrickscfg
           [DEFAULT]
           host = $DATABRICKS_HOST
@@ -34,4 +33,3 @@ jobs:
 
       - name: Trigger Databricks Job
         run: databricks jobs run-now --job-id "$DATABRICKS_JOB_ID"
-
