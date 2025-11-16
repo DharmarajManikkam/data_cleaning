@@ -3,8 +3,6 @@ name: Feature Creation Pipeline
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   run-feature-build:
@@ -14,13 +12,22 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install Databricks CLI (New)
+      - name: Install Databricks CLI (new)
         run: pip install databricks-cli
 
-      - name: Trigger Databricks Job using New CLI
+      - name: Configure Databricks CLI (manual config file)
         run: |
-          databricks jobs run-now --job-id $DATABRICKS_JOB_ID
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-          DATABRICKS_JOB_ID: ${{ secrets.DATABRICKS_JOB_ID }}
+          mkdir -p ~/.databricks
+          cat <<EOF > ~/.databricks/config
+          {
+            "host": "${{ secrets.DATABRICKS_HOST }}",
+            "token": "${{ secrets.DATABRICKS_TOKEN }}",
+            "profile": "DEFAULT"
+          }
+          EOF
+
+      - name: Test Authentication
+        run: databricks current-user me
+
+      - name: Trigger Databricks Job
+        run: databricks jobs run-now --job-id "${{ secrets.DATABRICKS_JOB_ID }}"
