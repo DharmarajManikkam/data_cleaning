@@ -29,3 +29,4 @@ jobs:
           databricks jobs run-now --job-id $DATABRICKS_JOB_ID
         env:
           DATABRICKS_JOB_ID: ${{ secrets.DATABRICKS_JOB_ID }}
+
